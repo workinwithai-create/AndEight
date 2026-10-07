@@ -1,8 +1,8 @@
-# WalkEight
+# AndEight
 
-Eight-bar bass desk for bedroom producers and AI-music finishers.
+Eight-bar low-end scheduling desk for bedroom producers and AI-music finishers.
 
-The loop is stuck because the bass never leaves the root. Chords and kit are already doing their job. WalkEight keeps both of them and only rewrites the upright: root-lock versus a walking line that approaches the next chord.
+A busy loop feels empty because the kick and the upright sit on the same downbeat. AndEight keeps the chords and the kit, and only moves the bass: stacked on the kick, or onto the and so the one has a chair.
 
 Live samples only — FluidR3 acoustic grand piano, upright bass, kick, snare, and hi-hat, copied from PreEight commit `d58301e4a494555f411a2afbc448b724136eee76` into `public/samples/`. No oscillators. Audio never leaves the tab.
 
@@ -11,13 +11,12 @@ Live samples only — FluidR3 acoustic grand piano, upright bass, kick, snare, a
 | Tool | Job |
 | --- | --- |
 | AnswerEight | Second verse that is not a reprint of verse one |
-| Unravel | Chorus that is not a louder verse |
-| PedalEight | Bass and cello hold a pedal while others move |
-| LineFour | Contrary motion, violin against upright |
-| HoleFour | Stop-time holes |
-| **WalkEight** | Change only the bass. Chords and kit stay. |
+| WalkEight | Walking bass line over a locked loop |
+| PedalEight | Bass holds a pedal |
+| HoleFour | Stop-time holes in the whole bar |
+| **AndEight** | Kick keeps the one. Upright takes the and. |
 
-Not a verse desk. Not a pedal desk. The comparison is root-lock against a walk, at matched loudness.
+Not a walking-bass desk. Not a stop-time desk. The comparison is stacked low end against scheduled low end, at matched loudness.
 
 ## Pricing
 
@@ -35,4 +34,4 @@ Export is 48 kHz, 24-bit stereo WAV, first downbeat at sample 0, ring-out folded
 
 ## Demo
 
-`demo.mp4` — root lock, then the walk, same chords and kit.
+`demo.mp4` — stacked low end, then the bass on the and. Same chords, same kit.

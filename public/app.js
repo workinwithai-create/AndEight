@@ -1,4 +1,4 @@
-/* WalkEight — audio clock scheduler. Samples bundled under /samples. */
+/* AndEight — audio clock scheduler. Samples bundled under /samples. */
 const LOOKAHEAD_MS = 25;
 const SCHEDULE_AHEAD = 0.12;
 const SR = 48000;
@@ -14,7 +14,7 @@ const state = {
   key: "C",
   chordsText: "Am F C G",
   bars: 8,
-  recipe: "root",
+  recipe: "stack",
   mutes: { piano: false, bass: false, kit: false }
 };
 
@@ -94,19 +94,10 @@ function bassLine(recipe) {
       const fifth = clampMidi(root + chord.iv[2], 40, 55);
       let midi = null;
       let dur = 0.9;
-      if (recipe === "root") {
-        if (beat === 0) { midi = root; dur = 1.95; }
+      if (recipe === "stack") {
+        if (beat === 0 || beat === 2) { midi = root; dur = 0.45; }
       } else {
-        const slot = stepInChord % 8;
-        if (slot === 0) midi = root;
-        else if (slot === 1) midi = third;
-        else if (slot === 2) midi = fifth;
-        else if (slot === 3) midi = clampMidi(root + 2, 40, 55);
-        else if (slot === 4) midi = fifth;
-        else if (slot === 5) midi = third;
-        else if (slot === 6) midi = root;
-        else midi = clampMidi(nextRoot - 1, 40, 55);
-        dur = 0.92;
+        if (beat === 0 || beat === 2) { midi = fifth; dur = 0.4; }
       }
       notes.push(midi == null ? null : { midi, dur });
     }
@@ -135,13 +126,13 @@ function pick(voice, midi) {
 
 function loadState() {
   try {
-    const saved = JSON.parse(localStorage.getItem("walkeight") || "{}");
+    const saved = JSON.parse(localStorage.getItem("andeight") || "{}");
     Object.assign(state, saved);
     state.mutes = Object.assign({ piano: false, bass: false, kit: false }, saved.mutes || {});
   } catch (e) { /* keep defaults */ }
 }
 function saveState() {
-  localStorage.setItem("walkeight", JSON.stringify(state));
+  localStorage.setItem("andeight", JSON.stringify(state));
 }
 
 async function preload() {
@@ -245,7 +236,7 @@ function scheduleStep(stepIndex, when, ac, dests) {
       playSample(ac, dests.piano, when, buf, p.rate, 0.28 - i * 0.03, stepDur * 4 * 0.96, true);
     });
   }
-  if (!state.mutes.bass && dests.bass && sixteenth % 4 === 0) {
+  if (!state.mutes.bass && dests.bass && (state.recipe === "stack" ? sixteenth % 8 === 0 : sixteenth % 8 === 2)) {
     const hit = beats[beat];
     if (hit) {
       const p = pick("bass", hit.midi);
@@ -316,7 +307,7 @@ function drawGrid() {
       const beat = Math.floor(i / 4);
       if (lane === "kit" && (i === 0 || i === 4 || i === 8 || i === 12 || i % 2 === 0)) cell.classList.add("hit");
       if (lane === "piano" && i === 0) cell.classList.add("hit");
-      if (lane === "bass" && i % 4 === 0 && beats[beat]) cell.classList.add("hit");
+      if (lane === "bass" && ((state.recipe === "stack" && i % 8 === 0) || (state.recipe === "ands" && i % 8 === 2)) && beats[Math.floor(i / 4)]) cell.classList.add("hit");
       grid.appendChild(cell);
     }
   });
@@ -347,7 +338,7 @@ function collectHits(recipe) {
     if (!state.mutes.piano && sixteenth === 0) {
       pianoVoicing(chord).forEach((midi, i) => hits.push({ when, chair: "piano", midi, gain: 0.28 - i * 0.03, dur: stepDur * 4 * 0.96 }));
     }
-    if (!state.mutes.bass && sixteenth % 4 === 0 && beats[beat]) {
+    if (!state.mutes.bass && ((recipe === "stack" && sixteenth % 8 === 0) || (recipe === "ands" && sixteenth % 8 === 2)) && beats[beat]) {
       hits.push({ when, chair: "bass", midi: beats[beat].midi, gain: 0.8, dur: stepDur * 4 * beats[beat].dur });
     }
   }
@@ -512,7 +503,7 @@ function midiBytes(hits) {
 }
 
 function fileBase() {
-  return "walkeight-" + state.recipe + "-" + state.bpm + "bpm-" + state.key;
+  return "andeight-" + state.recipe + "-" + state.bpm + "bpm-" + state.key;
 }
 function download(blob, name) {
   const a = document.createElement("a");
@@ -532,8 +523,8 @@ function bind() {
   $("key").value = state.key;
   $("chords").value = state.chordsText;
   $("bars").value = state.bars;
-  $("root").classList.toggle("on", state.recipe === "root");
-  $("walk").classList.toggle("on", state.recipe === "walk");
+  $("stack").classList.toggle("on", state.recipe === "stack");
+  $("ands").classList.toggle("on", state.recipe === "ands");
   document.querySelectorAll("[data-mute]").forEach((btn) => {
     btn.classList.toggle("on", !state.mutes[btn.dataset.mute]);
     btn.textContent = (state.mutes[btn.dataset.mute] ? "Muted " : "") + btn.dataset.mute;
@@ -547,8 +538,8 @@ function bind() {
     drawGrid();
   };
   ["bpm", "key", "chords", "bars"].forEach((id) => $(id).addEventListener("input", pull));
-  $("root").onclick = () => { state.recipe = "root"; saveState(); $("root").classList.add("on"); $("walk").classList.remove("on"); drawGrid(); };
-  $("walk").onclick = () => { state.recipe = "walk"; saveState(); $("walk").classList.add("on"); $("root").classList.remove("on"); drawGrid(); };
+  $("stack").onclick = () => { state.recipe = "stack"; saveState(); $("stack").classList.add("on"); $("ands").classList.remove("on"); drawGrid(); };
+  $("ands").onclick = () => { state.recipe = "ands"; saveState(); $("ands").classList.add("on"); $("stack").classList.remove("on"); drawGrid(); };
   document.querySelectorAll("[data-mute]").forEach((btn) => {
     btn.onclick = () => {
       state.mutes[btn.dataset.mute] = !state.mutes[btn.dataset.mute];
@@ -584,7 +575,7 @@ function bind() {
   requestAnimationFrame(paint);
 }
 
-window.WalkEight = { state, renderWav, collectHits, bassLine, SR };
+window.AndEight = { state, renderWav, collectHits, bassLine, SR };
 loadState();
 bind();
 preload();
