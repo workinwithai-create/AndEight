@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WalkEight — change only the bass</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>WalkEight</h1>
+    <p class="lede">The chords and the kit stay put. Only the upright changes. Root-lock is the stuck loop. Walk is the line that leaves the root so the chorus has somewhere to land.</p>
+    <p class="warn" id="tap">Tap to start audio. On iPhone, the silent switch mutes Web Audio.</p>
+  </header>
+  <main>
+    <div class="row">
+      <label>BPM <input id="bpm" type="number" min="60" max="180" value="92" /></label>
+      <label>Key
+        <select id="key"></select>
+      </label>
+      <label>Chords <input id="chords" value="Am F C G" size="18" /></label>
+      <label>Bars <input id="bars" type="number" min="4" max="16" value="8" /></label>
+    </div>
+    <div class="row">
+      <button id="play" class="primary">Play</button>
+      <button id="stop">Stop</button>
+      <button id="root" class="on">A · Root lock</button>
+      <button id="walk">B · Walk</button>
+      <button id="export">Export WAV + MIDI</button>
+      <button id="tail">Export with tail</button>
+    </div>
+    <div class="row chairs">
+      <button data-mute="piano">Piano</button>
+      <button data-mute="bass">Upright bass</button>
+      <button data-mute="kit">Kit</button>
+    </div>
+    <div id="grid" class="grid"></div>
+    <p class="status" id="status">Loading samples…</p>
+    <p class="warn" id="missing"></p>
+  </main>
+  <footer>Free desk. Samples are FluidR3 acoustic grand, upright bass, kick, snare, and hi-hat, copied from PreEight commit d58301e4a494555f411a2afbc448b724136eee76. Audio stays in the tab.</footer>
+  <script src="app.js"></script>
+</body>
+</html>
